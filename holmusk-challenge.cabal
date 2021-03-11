@@ -1,0 +1,13 @@
+cabal-version:       2.4
+name:                holmusk-challenge
+version:             0.1.0.0
+license:             ISC
+build-type:          Simple
+
+executable Hello
+  main-is:             Main.hs
+  build-depends:       base >=4.13
+                     , xmonad
+                     , xmonad-contrib
+                     , QuickCheck == 2.14.2
+  default-language:    Haskell2010
