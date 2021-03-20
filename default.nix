@@ -1,4 +1,4 @@
 let
   project = import ./project.nix;
 in
-project.holmusk-challenge.components.exes.Hello
+project.haskell-project.components.exes.Hello

@@ -1,0 +1,17 @@
+By now, you should understand how lazy input works in Haskell. But what about
+laziness during output?
+As you know, nothing in Haskell is evaluated before its value is needed. Since functions
+such as writeFile and putStr write out the entire String passed to them, that entire
+String must be evaluated. So you are guaranteed that the argument to putStr will be
+evaluated in full.§
+But what does that mean for laziness of the input? In the earlier examples, will the call
+to putStr or writeFile force the entire input string to be loaded into memory at once,
+just to be written out?
+The answer is no. putStr (and all the similar output functions) write out data as it
+becomes available. They also have no need for keeping around data already written, so
+as long as nothing else in the program needs it, the memory can be freed immediately.
+In a sense, you can think of the String between readFile and writeFile as a pipe linking
+the two. Data goes in one end, is transformed some way, and flows back out the other.
+You can verify this yourself by generating a large input.txt for toupper-lazy3.hs. It
+may take a bit to process, but you should see a constant—and low—memory usage
+while it is being processed.

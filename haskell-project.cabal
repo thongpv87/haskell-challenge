@@ -1,0 +1,29 @@
+cabal-version:       2.4
+name:                haskell-project
+version:             0.1.0.0
+license:             ISC
+build-type:          Simple
+
+library
+  exposed-modules:     PrettyJSON
+                       Prettify
+                       SimpleJSON
+
+                       PutJSON
+  hs-source-dirs:      src/ch05
+  build-depends:       base >= 4.13
+  
+executable Hello
+  main-is:             Main.hs
+  build-depends:       base >=4.13
+                     , random
+                     , containers >= 0.6
+                     , QuickCheck == 2.14.2
+  default-language:    Haskell2010
+
+executable Haskell
+  main-is:             src/Haskell.hs
+  build-depends:       base >=4.13
+                     , containers >= 0.6
+                     , QuickCheck == 2.14.2
+  default-language:    Haskell2010

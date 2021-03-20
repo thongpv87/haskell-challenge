@@ -1,0 +1,8 @@
++ List function
+  + take drop splitAt
+  + takeWhile dropWhile break span
+  + or and all any
+  + null head tail length last init reverse
+  + search list: elem filter isPrefixOf isInfixOf isSuffixOf
+  + string: lines, unlines, words, unwords
+    
