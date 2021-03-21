@@ -9,5 +9,5 @@ in
 nixpkgs.mkShell {
   name = "cabal-shell";
   inputsFrom = [ project.env ];
-  buildInputs = with hsPkgs; [ haskell-language-server cabal-install hie-bios ];
+  buildInputs = with hsPkgs; [ haskell-language-server cabal-install hie-bios hoogle ];
 }
