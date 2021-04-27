@@ -28,6 +28,7 @@
         tools = {
           cabal = "latest";
           hlint = "latest";
+          hie-bios = "latest";
           haskell-language-server = "latest";
         };
       };

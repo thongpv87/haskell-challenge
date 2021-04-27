@@ -1,8 +1,4 @@
-import System.Directory (doesDirectoryExist
-                        , getDirectoryContents
-                        , getPermissions
-                        , getModificationTime
-                        , Permissions)
+import System.Directory
 import System.FilePath ((</>))
 import Control.Monad (forM, mapM, liftM)
 import Data.List
@@ -13,7 +9,7 @@ import Control.Exception(handle, bracket, SomeException)
 
 data Info = Info {
   infoPath :: FilePath
-  , inforPerms :: Maybe Permissions
+  , infoPerms :: Maybe Permissions
   , infoSize :: Maybe Integer
   , infoModTime :: Maybe UTCTime
   } deriving (Eq, Ord, Show)
@@ -21,11 +17,10 @@ data Info = Info {
 traverse order path = do
   names <- getUsefulContents path
   contents <- mapM getInfo (path : map (path </>) names)
-  liftM concat $ forM (oder contents) $ \info -> do
+  liftM concat $ forM (order contents) $ \info -> do
     if isDirectory info && infoPath info /= path
       then Main.traverse order (infoPath info)
       else return [info]
-  return contents
 
 isDirectory :: Info -> Bool
 isDirectory = maybe False searchable . infoPerms
@@ -46,7 +41,11 @@ getUsefulContents path = do
   names <- getDirectoryContents path
   return (filter (`notElem` [".", ".."]) names)
 
+rotate = drop <> take
+
+ex1 = sortOn infoPath
+ex2 = rotate 1
 main = do
-  names <- Main.traverse id "."
-  putStrLn . intercalate "\n" . fmap show $  names
+  names <- Main.traverse (rotate 1) "src"
+  putStrLn . intercalate "\n" . fmap (show.infoPath) $ names
 

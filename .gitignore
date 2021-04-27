@@ -2,6 +2,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/haskell
 # Edit at https://www.toptal.com/developers/gitignore?templates=haskell
 
+## nix
+result/
+
 ### Haskell ###
 dist
 dist-*
