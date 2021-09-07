@@ -45,6 +45,7 @@ rotate = drop <> take
 
 ex1 = sortOn infoPath
 ex2 = rotate 1
+
 main = do
   names <- Main.traverse (rotate 1) "src"
   putStrLn . intercalate "\n" . fmap (show.infoPath) $ names

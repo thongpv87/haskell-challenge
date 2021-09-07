@@ -1,9 +1,10 @@
 module Main where
 
-import Control.Monad
-import Data.List as L
+import Control.Monad ( forM_ )
+import Data.List as L ( foldl', unfoldr )
 import qualified Data.Sequence as S
 import System.Random as R
+    ( newStdGen, Random(randomRs), RandomGen(split) )
 
 data Customer = Yellow | Red | Blue deriving (Show)
 
@@ -35,17 +36,17 @@ generators = unfoldr (Just . R.split)
 
 -- Generate infinite list of list of random float
 rolls :: (RandomGen g) => g -> [[Float]]
-rolls g = fmap (randomRs (0 :: Float, 1 :: Float)) $ generators g
+rolls g = randomRs (0 :: Float, 1 :: Float) <$> generators g
 
 -- Generate customer queue, each entry contains their arriving interval since last customer
 -- and processing time
 queue :: (RandomGen g) => g -> Customer -> [CustomerEntry]
 queue g c =
   let (ps1 : ps2 : xs : _) = rolls g
-      pArrives = fst $ unzip $ filter (\(pArrive, pJoin) -> pJoin <= pArrive) $ zip ps1 ps2
+      pArrives = map fst (filter (\(pArrive, pJoin) -> pJoin <= pArrive) $ zip ps1 ps2)
       arriveIntervals = fmap intervalTime pArrives
       processTimes = fmap (processTime c) xs
-   in fmap (\(x, y) -> CustomerEntry x y) $ zip arriveIntervals processTimes
+   in uncurry CustomerEntry <$> zip arriveIntervals processTimes
 
 toAbsoluteTime :: [CustomerEntry] -> [(Float, Float)]
 toAbsoluteTime cs = drop 1 $ scanl f (0.0, 0.0) cs
@@ -79,7 +80,7 @@ task2 cs =
 task3 xs cs =
   let
     rs = zip xs $ fmap task1 cs
-    cmp (_, (x1,y1)) (_, (x2, y2)) = if y1 - x1 < y2 - x2 then True else False
+    cmp (_, (x1,y1)) (_, (x2, y2)) = y1 - x1 < y2 - x2
     f c1 c2 =if cmp c1 c2 then c1 else c2
   in foldr1 f rs
 
@@ -90,15 +91,15 @@ simulate gs =
   let
     ncustomers = 1000 : fmap (*2) ncustomers
     customers = [Red, Yellow, Blue]
-    cs = fmap (\(c, i) -> queue (gs !! i) c) $ zip customers [1..]
+    cs = (\(c, i) -> queue (gs !! i) c) <$> zip customers [1..]
   in
   forM_ [0..] $
     \i->(do
             let n = ncustomers !! i
             putStrLn $ "i=" ++ show i ++ ", n=" ++ show n
-            putStrLn $ "waiting times: " ++ (show $ zip customers $ fmap (task1 . take n . queue (gs !! 0)) customers)
-            putStrLn $ "queue length : " ++ (show $ zip customers $ fmap (task2 . take n . queue (gs !! 0)) customers)
-            putStrLn $ "closest avg and max waiting time: " ++ (show $ task3 customers $ fmap (take n) cs)
+            putStrLn $ "waiting times: " ++ show (zip customers $ fmap (task1 . take n . queue (head gs)) customers)
+            putStrLn $ "queue length : " ++ show (zip customers $ fmap (task2 . take n . queue (head gs)) customers)
+            putStrLn $ "closest avg and max waiting time: " ++ show (task3 customers $ fmap (take n) cs)
             putStrLn "------------------------------------------------------------------"
         )
 
@@ -107,10 +108,10 @@ main = do
   g <- newStdGen
   let gs = generators g
   let customers = [Red, Yellow, Blue]
-  let cs = fmap (\(c, i) -> queue (gs !! i) c) $ zip customers [1..]
+  let cs = (\(c, i) -> queue (gs !! i) c) <$> zip customers [1..]
   -- let l = [CustomerEntry 1 10, CustomerEntry 5 18, CustomerEntry 2 1, CustomerEntry 100 10, CustomerEntry 4 2]
   let n = 1000000
-  putStrLn $ "Task 1 - Yellow customer waiting times: (avg,max)=" ++ (show $ task1 $ take n $ queue g Yellow)
-  putStrLn $ "Task 2 - Avg and max queue length of Red customers: (avg, max)=" ++ (show $ task2 $ take n $ queue g Red)
-  putStrLn $ "Task 3 - Closest avg and max waiting time: " ++ (show $ task3 customers $ fmap (take n) cs)
+  putStrLn $ "Task 1 - Yellow customer waiting times: (avg,max)=" ++ show (task1 $ take n $ queue g Yellow)
+  putStrLn $ "Task 2 - Avg and max queue length of Red customers: (avg, max)=" ++ show (task2 $ take n $ queue g Red)
+  putStrLn $ "Task 3 - Closest avg and max waiting time: " ++ show (task3 customers $ fmap (take n) cs)
   -- simulate gs
